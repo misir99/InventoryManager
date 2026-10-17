@@ -17,6 +17,8 @@ while (radi)
     Console.WriteLine("2. Dodaj proizvod");
     Console.WriteLine("3. Izmjena proizvoda");
     Console.WriteLine("4. Izbriši proizvod");
+    Console.WriteLine("5. Pretraži po kategoriji");
+    Console.WriteLine("6. Proizvodi s količinom manjom od 5.");
     Console.WriteLine("0. Izlaz");
     Console.Write("Odabir: ");
 
@@ -123,6 +125,45 @@ while (radi)
                     Console.WriteLine("Brisanje otkazano");
                 }
                     break;
+            }
+        case "5":
+            {
+                Console.WriteLine("Unesite kategoriju: ");
+                string? searchCategory = Console.ReadLine();
+                var found = repo.GetAll().
+                    Where(p => p.Category.Equals(searchCategory, StringComparison.OrdinalIgnoreCase))
+                    .ToList();
+
+                if(found.Count == 0)
+                {
+                    Console.WriteLine("Neam proizvoda u toj kategoriji.");
+                    break;
+                }
+
+                foreach(var p in found)
+                {
+                    Console.WriteLine($"{p.Id}: {p.Name} - {p.Price:F2} KM ({p.Category}), kom: {p.Quantity}");
+                }
+                break;
+            }
+        case "6":
+            {
+                var lowStock = repo.GetAll()
+                    .Where(p => p.Quantity < 5)
+                    .OrderBy(p =>  p.Quantity)
+                    .ToList();
+
+                if(lowStock.Count == 0)
+                {
+                    Console.WriteLine("Nema proizvoda s malom količinom.");
+                    break;
+                }
+
+                foreach(var item in lowStock)
+                {
+                    Console.WriteLine($"{item.Id}: {item.Name} - {item.Price:F2} KM ({item.Category}), kom: {item.Quantity}");
+                }
+                break;
             }
         case "0":
                 radi = false;

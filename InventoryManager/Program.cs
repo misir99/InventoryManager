@@ -15,6 +15,8 @@ while (radi)
 {
     Console.WriteLine("\n1. Prikaži sve proizvode");
     Console.WriteLine("2. Dodaj proizvod");
+    Console.WriteLine("3. Izmjena proizvoda");
+    Console.WriteLine("4. Izbriši proizvod");
     Console.WriteLine("0. Izlaz");
     Console.Write("Odabir: ");
 
@@ -55,7 +57,74 @@ while (radi)
                 Console.WriteLine("Proizvod je dodan.");
             }
             break;
-            case "0":
+        case "3":
+            {
+                Console.WriteLine ("Unesite ID proizvoda koji želite izmijeniti: ");
+                if(!int.TryParse(Console.ReadLine(), out int editId))
+                {
+                    Console.WriteLine("Neispravan Id.");
+                    break;
+                }
+
+                var existing = repo.GetById(editId);
+                if(existing == null)
+                {
+                    Console.WriteLine("Proizvod ne postoji.");
+                    break;
+                }
+
+                Console.Write($"Novi naziv ({existing.Name}): ");
+                string? newName = Console.ReadLine();
+                if (!string.IsNullOrWhiteSpace(newName))
+                    existing.Name = newName;
+                Console.Write($"Nova cijena ({existing.Price:F2}): ");
+                if (decimal.TryParse(Console.ReadLine(), out decimal newPrice))
+                    existing.Price = newPrice;
+
+                Console.Write($"Nova kategorija ({existing.Category}): ");
+                string? newCategory = Console.ReadLine();
+                if (!string.IsNullOrWhiteSpace(newCategory))
+                    existing.Category = newCategory;
+
+                Console.Write($"Nova količina ({existing.Quantity}): ");
+                if (int.TryParse(Console.ReadLine(), out int newQuantity))
+                    existing.Quantity = newQuantity;
+
+                repo.Update(existing);
+                Console.WriteLine("Proizvod izmijenjen.");
+                break;
+
+            }
+        case "4":
+            {
+
+                Console.WriteLine("Koji Id želite obrisati?");
+                if(!int.TryParse (Console.ReadLine(), out int deleteId))
+                {
+                    Console.WriteLine("Neispravan Id.");
+                    break;
+                }
+
+                var toDelete = repo.GetById(deleteId);
+                if(toDelete == null)
+                {
+                    Console.WriteLine("Proizvod ne postoji.");
+                    break;
+                }
+                Console.Write($"Obrisati '{toDelete.Name}'? (d/n): ");
+                string? potvrda = Console.ReadLine();
+                if (potvrda?.ToLower() == "d")
+                {
+                    repo.Delete(deleteId);
+                    Console.WriteLine("Proizvod obrisan.");
+                }
+                else
+                {
+                    Console.WriteLine("Brisanje otkazano");
+                }
+                    break;
+            }
+        case "0":
                 radi = false;
                 break;
             default:

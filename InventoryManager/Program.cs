@@ -1,9 +1,15 @@
 ﻿using InventoryManager.Models;
 using InventoryManager.Repositories;
 using Microsoft.Data.SqlClient;
+using Microsoft.Extensions.Configuration;
 
-string connectionString = "Server=localhost;Database=InventoryDb;Trusted_Connection=True;TrustServerCertificate=True;";
+var config = new ConfigurationBuilder()
+    .SetBasePath(AppContext.BaseDirectory)
+    .AddJsonFile("appsettings.json")
+    .Build();
 
+string connectionString = config.GetConnectionString("InventoryDb")
+    ?? throw new InvalidOperationException("Connection string nije pronađen.");
 IProductRepository repo = new SqlProductRepository(connectionString);
 
 //repo.Add(new Product { Name = "Laptop", Price = 999.99m, Category = "Elektronika", Quantity = 5 });

@@ -2,6 +2,7 @@
 using InventoryManager.Repositories;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
+using InventoryManager.Exceptions;
 
 var config = new ConfigurationBuilder()
     .SetBasePath(AppContext.BaseDirectory)
@@ -184,6 +185,10 @@ while (radi)
                 Console.WriteLine("nepoznata opcija");
                 break;
         }
+    }
+    catch (ProductNotFoundException ex)
+    {
+        Console.WriteLine(ex.Message);
     }
     catch (SqlException ex) {
         Console.WriteLine($"Greška s bazom: {ex.Message}");

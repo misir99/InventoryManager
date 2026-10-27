@@ -1,5 +1,6 @@
 ﻿using InventoryManager.Models;
 using Microsoft.Data.SqlClient;
+using InventoryManager.Exceptions;
 
 namespace InventoryManager.Repositories
 {
@@ -103,7 +104,9 @@ namespace InventoryManager.Repositories
             cmd.Parameters.AddWithValue("@Category", product.Category);
             cmd.Parameters.AddWithValue("@Quantity", product.Quantity);
 
-            cmd.ExecuteNonQuery();
+            int affected = cmd.ExecuteNonQuery();
+            if (affected == 0)
+                throw new ProductNotFoundException(product.Id);
         }
 
         public void Delete(int id)
@@ -116,7 +119,9 @@ namespace InventoryManager.Repositories
             using var cmd = new SqlCommand(sql, conn);
             cmd.Parameters.AddWithValue("@Id", id);
 
-            cmd.ExecuteNonQuery();
+            int affected = cmd.ExecuteNonQuery();
+            if (affected == 0)
+                throw new ProductNotFoundException(id);
         }
     }
 }

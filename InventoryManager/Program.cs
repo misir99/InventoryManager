@@ -3,6 +3,8 @@ using InventoryManager.Repositories;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using InventoryManager.Exceptions;
+using InventoryManager.Data;
+using Microsoft.EntityFrameworkCore;
 
 var config = new ConfigurationBuilder()
     .SetBasePath(AppContext.BaseDirectory)
@@ -11,8 +13,13 @@ var config = new ConfigurationBuilder()
 
 string connectionString = config.GetConnectionString("InventoryDb")
     ?? throw new InvalidOperationException("Connection string nije pronađen.");
-IProductRepository repo = new SqlProductRepository(connectionString);
+//IProductRepository repo = new SqlProductRepository(connectionString);
+var options = new DbContextOptionsBuilder<AppDbContext>()
+    .UseSqlServer(connectionString)
+    .Options;
 
+using var context = new AppDbContext(options);
+IProductRepository repo = new EfProductRepository(context);
 //repo.Add(new Product { Name = "Laptop", Price = 999.99m, Category = "Elektronika", Quantity = 5 });
 
 
@@ -192,6 +199,10 @@ while (radi)
     }
     catch (SqlException ex) {
         Console.WriteLine($"Greška s bazom: {ex.Message}");
+    }
+    catch (DbUpdateException ex)
+    {
+        Console.WriteLine($"Greška pri spremanju u bazu: {ex.InnerException?.Message ?? ex.Message}");
     }
     catch(Exception ex)
     {

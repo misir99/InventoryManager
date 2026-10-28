@@ -43,7 +43,7 @@ while (radi)
         switch (unos)
         {
             case "1":
-                foreach (var p in repo.GetAll())
+                foreach (var p in await repo.GetAllAsync())
                 {
                     Console.WriteLine($"{p.Id}: {p.Name} - {p.Price:F2} KM ({p.Category}), kom: {p.Quantity}");
                 }
@@ -74,7 +74,7 @@ while (radi)
                         Category = category ?? "",
                         Quantity = quantity
                     };
-                    repo.Add(product);
+                    await repo.AddAsync(product);
                     Console.WriteLine("Proizvod je dodan.");
                 }
                 break;
@@ -87,7 +87,7 @@ while (radi)
                         break;
                     }
 
-                    var existing = repo.GetById(editId);
+                    var existing = await repo.GetByIdAsync(editId);
                     if (existing == null)
                     {
                         Console.WriteLine("Proizvod ne postoji.");
@@ -111,7 +111,7 @@ while (radi)
                     if (int.TryParse(Console.ReadLine(), out int newQuantity))
                         existing.Quantity = newQuantity;
 
-                    repo.Update(existing);
+                    await repo.UpdateAsync(existing);
                     Console.WriteLine("Proizvod izmijenjen.");
                     break;
 
@@ -126,7 +126,7 @@ while (radi)
                         break;
                     }
 
-                    var toDelete = repo.GetById(deleteId);
+                    var toDelete = await repo.GetByIdAsync(deleteId);
                     if (toDelete == null)
                     {
                         Console.WriteLine("Proizvod ne postoji.");
@@ -136,7 +136,7 @@ while (radi)
                     string? potvrda = Console.ReadLine();
                     if (potvrda?.ToLower() == "d")
                     {
-                        repo.Delete(deleteId);
+                        await repo.DeleteAsync(deleteId);
                         Console.WriteLine("Proizvod obrisan.");
                     }
                     else
@@ -149,7 +149,7 @@ while (radi)
                 {
                     Console.WriteLine("Unesite kategoriju: ");
                     string? searchCategory = Console.ReadLine();
-                    var found = repo.GetAll().
+                    var found = (await repo.GetAllAsync()).
                         Where(p => p.Category.Equals(searchCategory, StringComparison.OrdinalIgnoreCase))
                         .ToList();
 
@@ -167,7 +167,7 @@ while (radi)
                 }
             case "6":
                 {
-                    var lowStock = repo.GetAll()
+                    var lowStock = (await repo.GetAllAsync())
                         .Where(p => p.Quantity < 5)
                         .OrderBy(p => p.Quantity)
                         .ToList();
@@ -197,14 +197,15 @@ while (radi)
     {
         Console.WriteLine(ex.Message);
     }
-    catch (SqlException ex) {
+    catch (SqlException ex)
+    {
         Console.WriteLine($"Greška s bazom: {ex.Message}");
     }
     catch (DbUpdateException ex)
     {
         Console.WriteLine($"Greška pri spremanju u bazu: {ex.InnerException?.Message ?? ex.Message}");
     }
-    catch(Exception ex)
+    catch (Exception ex)
     {
         Console.WriteLine($"Neočekivana greška: {ex.Message}");
     }

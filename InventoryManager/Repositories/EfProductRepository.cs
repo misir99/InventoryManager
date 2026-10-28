@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using InventoryManager.Data;
+﻿using InventoryManager.Data;
 using InventoryManager.Exceptions;
 using InventoryManager.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace InventoryManager.Repositories
 {
@@ -18,26 +14,26 @@ namespace InventoryManager.Repositories
             _context = context;
         }
 
-        public List<Product> GetAll()
+        public async Task<List<Product>> GetAllAsync()
         {
-            return _context.Products.ToList();
+            return await _context.Products.ToListAsync();
 
         }
 
-        public Product? GetById(int id)
+        public async Task<Product?> GetByIdAsync(int id)
         {
-            return _context.Products.Find(id);
+            return await _context.Products.FindAsync(id);
         }
 
-        public void Add(Product product)
+        public async Task AddAsync(Product product)
         {
             _context.Products.Add(product);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
         }
 
-        public void Update(Product product)
+        public async Task UpdateAsync(Product product)
         {
-            var existing = _context.Products.Find(product.Id);
+            var existing = await _context.Products.FindAsync(product.Id);
             if (existing == null)
                 throw new ProductNotFoundException(product.Id);
 
@@ -46,19 +42,19 @@ namespace InventoryManager.Repositories
             existing.Category = product.Category;
             existing.Quantity = product.Quantity;
 
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
         }
 
-        public void Delete(int id)
+        public async Task DeleteAsync(int id)
         {
-            var existing = _context.Products.Find(id);
+            var existing = await _context.Products.FindAsync(id);
             if (existing == null)
                 throw new ProductNotFoundException(id);
 
             _context.Products.Remove(existing);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
         }
-                
-            }
-        }
-    
+    }
+
+}
+
